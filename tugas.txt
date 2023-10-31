@@ -1,0 +1,79 @@
+// Membuka atau membuat database
+var request = window.indexedDB.open('MyDatabase', 1);
+var db;
+
+request.onupgradeneeded = function(event) {
+  // Inisialisasi struktur database
+  db = event.target.result;
+  var objectStore = db.createObjectStore('MyObjectStore', { keyPath: 'id', autoIncrement:true });
+  objectStore.createIndex('name', 'name', { unique: false });
+};
+
+request.onsuccess = function(event) {
+  db = event.target.result;
+};
+
+request.onerror = function(event) {
+  console.log('Error:', event.target.errorCode);
+};
+
+// Fungsi Create (Tambah data)
+function addData(data) {
+  var transaction = db.transaction(['MyObjectStore'], 'readwrite');
+  var objectStore = transaction.objectStore('MyObjectStore');
+  var request = objectStore.add(data);
+
+  request.onsuccess = function(event) {
+    console.log('Data berhasil ditambahkan');
+  };
+
+  request.onerror = function(event) {
+    console.log('Error:', event.target.errorCode);
+  };
+}
+
+// Fungsi Read (Mengambil data)
+function getData(id) {
+  var transaction = db.transaction(['MyObjectStore'], 'readonly');
+  var objectStore = transaction.objectStore('MyObjectStore');
+  var request = objectStore.get(id);
+
+  request.onsuccess = function(event) {
+    var data = event.target.result;
+    console.log('Data:', data);
+  };
+
+  request.onerror = function(event) {
+    console.log('Error:', event.target.errorCode);
+  };
+}
+
+// Fungsi Update (Memperbarui data)
+function updateData(id, newData) {
+  var transaction = db.transaction(['MyObjectStore'], 'readwrite');
+  var objectStore = transaction.objectStore('MyObjectStore');
+  var request = objectStore.put(newData, id);
+
+  request.onsuccess = function(event) {
+    console.log('Data berhasil diperbarui');
+  };
+
+  request.onerror = function(event) {
+    console.log('Error:', event.target.errorCode);
+  };
+}
+
+// Fungsi Delete (Hapus data)
+function deleteData(id) {
+  var transaction = db.transaction(['MyObjectStore'], 'readwrite');
+  var objectStore = transaction.objectStore('MyObjectStore');
+  var request = objectStore.delete(id);
+
+  request.onsuccess = function(event) {
+    console.log('Data berhasil dihapus');
+  };
+
+  request.onerror = function(event) {
+    console.log('Error:', event.target.errorCode);
+  };
+}
